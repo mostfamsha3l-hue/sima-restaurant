@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مطعم سيما · حجز طاولة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f1ea; --surface:#ffffff; --ink:#1b2a24; --muted:#5d6b64; --line:#d9ddd5;
+  --green:#1e4535; --green-ink:#f6f1e3; --gold:#b8901f; --gold-soft:#f6ecd2;
+  --taken:#c9cfc8; --ok:#2f7a55; --danger:#a33b2b;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a17; --surface:#1b2622; --ink:#ecebe4; --muted:#a3b0a9; --line:#2e3c36;
+    --green:#173a2c; --green-ink:#f6f1e3; --gold:#d6ab3a; --gold-soft:#3a3220;
+    --taken:#3a4440; --ok:#5fb88a; --danger:#e07a68; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a17; --surface:#1b2622; --ink:#ecebe4; --muted:#a3b0a9; --line:#2e3c36;
+  --green:#173a2c; --green-ink:#f6f1e3; --gold:#d6ab3a; --gold-soft:#3a3220;
+  --taken:#3a4440; --ok:#5fb88a; --danger:#e07a68; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;font-size:16px;line-height:1.7}
+h1,h2,h3{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",Tahoma,sans-serif;margin:0;line-height:1.35}
+header.top{background:var(--green);color:var(--green-ink);padding:28px 20px 30px}
+.wrap{max-width:1240px;margin:0 auto}
+header.top h1{font-size:clamp(34px,7vw,56px);font-weight:800;letter-spacing:0}
+header.top p{margin:4px 0 0;opacity:.85;font-size:17px}
+header.top p.welcome{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",Tahoma,sans-serif;font-size:clamp(18px,3.4vw,24px);font-weight:500;color:var(--gold);opacity:1;margin:2px 0 10px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-top:22px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.field label{opacity:.85}
+.bar input,.bar select{font:inherit;font-size:16px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--green-ink);min-width:150px}
+.bar select option{color:#1b2a24}
+main{padding:20px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}}
+.plan-card{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.plan-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+.plan-scroll svg{display:block;width:100%;min-width:820px;height:auto}
+.hint{font-size:14px;color:var(--muted);margin:8px 4px 0;display:none}
+@media (max-width:860px){.hint{display:block}}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:12px 4px 2px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:18px;border-radius:5px;border:2px solid #c9cfc8;background:#fff;display:inline-block}
+.sw.vip{border-color:#b8901f;background:#fbf2df}
+.sw.taken{background:repeating-linear-gradient(45deg,#c9cfc8 0 4px,#e3e7e1 4px 8px);border-color:#aab3ab}
+.sw.sel{border-color:#2f7a55;border-width:3px}
+.tbl{cursor:pointer}
+.tbl:focus{outline:none}
+.tbl:focus-visible .face{stroke:#2f7a55;stroke-width:12}
+.tbl.taken{cursor:not-allowed}
+.tbl.nobook{cursor:default}
+aside.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+@media (max-width:980px){aside.panel{position:static}}
+.panel h2{font-size:22px;font-weight:700}
+.panel .sub{color:var(--muted);margin:2px 0 16px;font-size:15px}
+.empty{color:var(--muted)}
+.empty strong{color:var(--ink)}
+form{display:grid;gap:12px}
+form label{font-size:14px;color:var(--muted);display:block;margin-bottom:3px}
+form input,form select,form textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+form textarea{min-height:70px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{font:inherit;font-weight:600;font-size:16px;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;background:var(--green);color:var(--green-ink);width:100%;text-align:center;text-decoration:none;display:block}
+.btn.gold{background:var(--gold);color:#1b1404}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.chip{display:inline-block;font-size:13px;padding:2px 10px;border-radius:99px;background:var(--gold-soft);color:var(--ink);margin-inline-start:6px;vertical-align:middle}
+.note{font-size:14px;color:var(--muted);margin:0}
+.msg{border-radius:12px;padding:12px 14px;font-size:15px;margin-top:12px;display:none}
+.msg.show{display:block}
+.msg.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ink)}
+.msg.err{background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--ink)}
+section.staff{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:none}
+section.staff.show{display:block}
+.staff h2{font-size:20px}
+.res-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.res-list li{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.res-list .who{font-weight:600}
+.res-list .meta{font-size:14px;color:var(--muted)}
+.res-list button{font:inherit;font-size:14px;border:1px solid var(--line);background:transparent;color:var(--danger);border-radius:10px;padding:6px 12px;cursor:pointer}
+section.share{margin-top:20px;background:var(--green);color:var(--green-ink);border-radius:18px;padding:22px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.share .qr{background:#fff;border-radius:14px;padding:10px;width:170px;height:170px;flex:none}
+.share .qr img,.share .qr svg{width:100%;height:100%;display:block}
+.share h2{font-size:22px}
+.share p{margin:6px 0 0;opacity:.85;max-width:52ch}
+footer{color:var(--muted);font-size:13px;text-align:center;padding:20px}
+.prog-btn{font:inherit;font-weight:600;font-size:16px;padding:9px 22px;border-radius:10px;border:1px solid var(--gold);background:var(--gold);color:#1b1404;cursor:pointer}
+.prog-btn:focus-visible{outline:3px solid var(--green-ink);outline-offset:2px}
+dialog.prog{border:0;border-radius:18px;padding:0;width:min(720px,94vw);max-width:94vw;background:var(--surface);color:var(--ink)}
+dialog.prog::backdrop{background:rgba(10,20,16,.6)}
+.prog-head{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.prog-head h2{font-size:20px}
+.prog-body{padding:18px;max-height:70vh;overflow:auto}
+.prog-body img{width:100%;height:auto;border-radius:12px;display:block}
+.prog-tools{display:flex;gap:10px;padding:0 18px 12px;flex-wrap:wrap}
+.prog-tools .btn{width:auto;flex:1;min-width:140px}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
+.x{font:inherit;font-size:26px;line-height:1;background:none;border:0;color:var(--ink);cursor:pointer;padding:4px 10px;border-radius:8px}
+#progNote{padding:0 18px 16px;margin:0}
+@media (prefers-reduced-motion:no-preference){.tbl .face{transition:fill .15s,stroke .15s}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>مطعم سيما</h1>
+    <p class="welcome">أهلاً وسهلاً بكم في سيما، حيث يلتقي الطعم الطيب بأجمل السهرات.</p>
+    <p>اختر التاريخ والوقت، ثم اضغط على الطاولة التي تريد حجزها في المخطط. الحجز متاح من 9 مساءً حتى 6 صباحاً.</p>
+    <div class="bar">
+      <div class="field"><label for="fDate">التاريخ</label><input type="date" id="fDate"></div>
+      <div class="field"><label for="fTime">الوقت</label><select id="fTime"></select></div>
+      <div class="field"><label for="fTable">أو اختر رقم الطاولة</label><select id="fTable"><option value="">اختر طاولة</option></select></div>
+      <button type="button" class="prog-btn" id="progBtn" hidden>البرنامج</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="layout">
+      <div class="plan-card">
+        <div class="plan-scroll" id="planScroll" dir="ltr"><svg id="plan" viewBox="190 690 3230 2290" role="img" aria-label="مخطط صالة مطعم سيما"></svg></div>
+        <p class="hint">اسحب المخطط يميناً ويساراً لرؤية بقية الصالة.</p>
+        <div class="legend">
+          <span><i class="sw"></i>طاولة متاحة</span>
+          <span><i class="sw vip"></i>طاولة VIP</span>
+          <span><i class="sw taken"></i>محجوزة في هذا الوقت</span>
+          <span><i class="sw" style="background:#e3e7e1"></i>طاولات البنات: غير متاحة للحجز</span>
+          <span><i class="sw sel"></i>اختيارك</span>
+        </div>
+      </div>
+
+      <aside class="panel" id="panel" aria-live="polite">
+        <div id="panelEmpty" class="empty">
+          <h2>لم تختر طاولة بعد</h2>
+          <p class="sub">اضغط على أي طاولة في المخطط لتظهر تفاصيلها ونموذج الحجز هنا.</p>
+          <p class="note">الطاولات المخططة محجوزة في الوقت الذي اخترته. جرّب وقتاً آخر إن لم تجد ما يناسبك.</p>
+        </div>
+        <div id="panelForm" hidden>
+          <h2 id="pTitle"></h2>
+          <p class="sub" id="pSub"></p>
+          <form id="form" novalidate>
+            <div class="row2">
+              <div><label for="name">الاسم</label><input id="name" autocomplete="name" required></div>
+              <div><label for="phone">رقم الجوال</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required></div>
+            </div>
+            <div><label for="guests">عدد الأشخاص</label><select id="guests"></select></div>
+            <div><label for="notes">ملاحظات (اختياري)</label><textarea id="notes"></textarea></div>
+            <a class="btn gold" id="sendWa" href="#" target="_blank" rel="noopener">إرسال طلب الحجز عبر واتساب</a>
+            <button type="button" class="btn ghost" id="copyReq">نسخ تفاصيل الطلب</button>
+            <button type="submit" class="btn" id="saveBtn" hidden>تأكيد الحجز في النظام</button>
+            <p class="note" id="formNote"></p>
+          </form>
+          <div class="msg" id="msg"></div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="staff" id="staff">
+      <h2>حجوزات <span id="staffDate"></span></h2>
+      <p class="note">هذا القسم يظهر لصاحب المطعم فقط. الحجوزات المؤكدة هنا تظهر على المخطط كطاولات محجوزة.</p>
+      <ul class="res-list" id="resList"></ul>
+    </section>
+  </div>
+</main>
+<dialog class="prog" id="progDlg" aria-labelledby="progTitle">
+  <div class="prog-head"><h2 id="progTitle">البرنامج</h2><button type="button" class="x" id="progClose" aria-label="إغلاق">×</button></div>
+  <div class="prog-body"><img id="progImg" alt="برنامج مطعم سيما" hidden><p id="progEmpty" class="empty">لم يُضف البرنامج بعد.</p></div>
+  <div class="prog-tools" id="progTools" hidden>
+    <button type="button" class="btn gold" id="progUp">تحميل صورة</button>
+    <button type="button" class="btn danger" id="progDel">حذف الصورة</button>
+    <input type="file" id="progFile" accept="image/*" hidden>
+  </div>
+  <p class="note" id="progNote"></p>
+</dialog>
+<footer>مطعم سيما · الحجز يُؤكَّد من المطعم</footer>
+
+<script>
+/* ===== Settings ===== */
+const WHATSAPP = "9647760835515"; // رقم واتساب المطعم بالصيغة الدولية بدون + مثل 9665XXXXXXXX
+const HOLD_MINUTES = 120; // مدة الحجز الواحد
+
+/* ===== Floor data (coordinates in plan units) ===== */
+const T = [];
+const add = (id,label,kind,x,y,w,h) => T.push({id,label,kind,x,y,w,h,seats:null}); // بدون عدد مقاعد
+// perimeter
+add("36","36","reg",528,716,301,322,6);
+add("35","35","vip",841,716,287,322,6);
+add("34","34","vip",1140,716,450,322,8);
+add("33","33","vip",1599,716,442,322,8);
+[["37",1051,378],["38",1441,292],["39",1745,274],["40",2028,263],["41",2309,299]].forEach(([n,y,h])=>add(n,n,"reg",206,y,451,h,8));
+[["32",1051,402],["31",1468,349],["30",1831,383],["29",2229,358]].forEach(([n,y,h])=>add(n,n,"reg",2945,y,448,h,8));
+[["42",666,218,6],["43",895,247,6],["44",1155,331,6],["26",2264,340,6],["27",2619,286,6],["28",2918,478,8]].forEach(([n,x,w,s])=>add(n,n,"reg",x,2613,w,341,s));
+// interior VIP
+[["6",1219,1638,134,140],["5",1622,1622,161,152],["4",1964,1622,188,152],["3",2424,1692,152,188],["2",2424,2071,152,188],["1",2411,2372,152,188],["7",1108,1962,122,122],["8",1108,2193,122,152],["9",1124,2467,122,107]]
+  .forEach(([n,cx,cy,w,h])=>add(n,n,"vip",cx-w/2,cy-h/2,w,h,null));
+// interior regular (all same size)
+const S=150, sq=(n,label,cx,cy)=>add(n,label,"reg",cx-S/2,cy-S/2,S,S,null);
+sq("12","12",870,1985); sq("11","11",870,2252); sq("10","10",870,2485);
+sq("14","14",750,1520);
+["15","16","17","18","19"].forEach((n,i)=>sq(n,n,985+i*250,1397));
+sq("B1","بنات",810,1752); sq("B2","بنات",2258,1397); sq("B3","بنات",2531,1397);
+for(let i=0;i<6;i++) sq(String(20+i),String(20+i),2804,1420+i*210);
+const byId = Object.fromEntries(T.map(t=>[t.id,t]));
+const NOBOOK = new Set(["B1","B2","B3"]); // طاولات البنات: غير متاحة للحجز
+const tableName = t => t.id.startsWith("B") ? `طاولة بنات (${t.id.slice(1)})` : `طاولة ${t.label}`;
+
+/* ===== State ===== */
+let selected = null, slots = [], reservations = [], db = null, staff = false;
+const $ = s => document.querySelector(s);
+
+/* ===== Date / time controls ===== */
+const pad = n => String(n).padStart(2,"0");
+const today = new Date();
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+$("#fDate").value = isoDate(today); $("#fDate").min = isoDate(today);
+const times=[]; for(let m=21*60; m<=30*60; m+=30){ times.push(`${pad(Math.floor(m/60)%24)}:${pad(m%60)}`) }
+const fmtT = t => { const [h,m]=t.split(":").map(Number); const suf = (h>=12)?"م":"ص"; const h12=((h+11)%12)+1; return `${h12}:${pad(m)} ${suf}`; };
+times.forEach(t=>$("#fTime").add(new Option(fmtT(t),t)));
+$("#fTime").value = "21:00";
+for(let g=1; g<=12; g++) $("#guests").add(new Option(g===1?"شخص واحد":g===2?"شخصان":`${g} أشخاص`, g));
+$("#guests").value = 2;
+T.filter(t=>!NOBOOK.has(t.id)).sort((a,b)=>{const na=+a.id||100+ +a.id.slice(1), nb=+b.id||100+ +b.id.slice(1); return na-nb})
+ .forEach(t=>$("#fTable").add(new Option(tableName(t)+(t.kind==="vip"?" · VIP":"")+(t.seats?` · ${t.seats} مقاعد`:""), t.id)));
+const fmtDate = iso => { try{ return new Date(iso+"T12:00").toLocaleDateString("ar",{weekday:"long",day:"numeric",month:"long"}) }catch(e){ return iso } };
+const mins = t => { const [h,m]=t.split(":").map(Number); return (h<12?h+24:h)*60+m };
+
+function isTaken(id){
+  const d=$("#fDate").value, t=mins($("#fTime").value);
+  return slots.some(s=>s.table===id && s.date===d && Math.abs(mins(s.time)-t) < HOLD_MINUTES);
+}
+
+/* ===== Plan rendering ===== */
+const NS="http://www.w3.org/2000/svg";
+const el=(tag,attrs={},parent)=>{const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e;};
+const txt=(parent,x,y,s,size,attrs={})=>{const e=el("text",{x,y,"font-size":size,"text-anchor":"middle","dominant-baseline":"central","font-family":"Noto Kufi Arabic, IBM Plex Sans Arabic, Tahoma, sans-serif",...attrs},parent); e.textContent=s; return e;};
+
+function drawStatic(svg){
+  const defs=el("defs",{},svg);
+  const pat=el("pattern",{id:"grid",width:80,height:80,patternUnits:"userSpaceOnUse"},defs);
+  el("rect",{width:80,height:80,fill:"#f1f3ef"},pat);
+  el("path",{d:"M80 0H0V80",fill:"none",stroke:"#e3e7e1","stroke-width":3},pat);
+  const hatch=el("pattern",{id:"hatch",width:28,height:28,patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},defs);
+  el("rect",{width:28,height:28,fill:"#dde2db"},hatch); el("rect",{width:14,height:28,fill:"#c9d0c7"},hatch);
+  const sh=el("filter",{id:"sh",x:"-10%",y:"-10%",width:"120%",height:"130%"},defs);
+  el("feDropShadow",{dx:0,dy:6,stdDeviation:6,"flood-color":"#1b2a24","flood-opacity":.14},sh);
+
+  el("rect",{x:198,y:704,width:3204,height:2258,rx:6,fill:"url(#grid)",stroke:"#1f2a26","stroke-width":16},svg);
+  el("rect",{x:662,y:1044,width:2274,height:1564,fill:"none",stroke:"#5f6d66","stroke-width":5,"stroke-dasharray":"34 22"},svg);
+  // restrooms
+  [[215,305,"حمامات","نسائية","w"],[2966,427,"حمامات رجال",null,"m"]].forEach(([x,w,a,b,k])=>{
+    el("rect",{x,y:716,width:w,height:322,rx:22,fill:"#c9d1c6"},svg);
+    const cx=x+w/2, g=el("g",{fill:"#1e4535"},svg);
+    el("circle",{cx,cy:775,r:15},g);
+    if(k==="w") el("path",{d:`M${cx-12} 796h24l20 52h-64z M${cx-14} 846h10v40h-10z M${cx+4} 846h10v40h-10z`},g);
+    else el("path",{d:`M${cx-20} 796h40v48h-40z M${cx-18} 840h14v46h-14z M${cx+4} 840h14v46h-14z`},g);
+    if(b){ txt(svg,cx,935,a,52,{fill:"#4f5e57"}); txt(svg,cx,998,b,52,{fill:"#4f5e57"}); }
+    else txt(svg,cx,950,a,52,{fill:"#4f5e57"});
+  });
+  // bar
+  el("rect",{x:2076,y:722,width:824,height:300,rx:22,fill:"#c9d1c6"},svg);
+  el("rect",{x:2100,y:756,width:775,height:112,rx:16,fill:"#9d6634"},svg);
+  el("rect",{x:2100,y:858,width:775,height:10,fill:"#d9a440"},svg);
+  txt(svg,2488,806,"البار",68,{fill:"#fbe8c6","font-weight":800});
+  const ic=el("g",{fill:"#fbe8c6"},svg);
+  [2160,2810].forEach(x=>el("path",{d:`M${x-12} 850v-46q0-6 6-10l2-6v-16h8v16l2 6q6 4 6 10v46z`},ic));
+  el("path",{d:"M2214 786h52l-26 30v26h14v6h-34v-6h14v-26z"},ic);
+  el("path",{d:"M2698 790h36l-5 58h-26z"},ic);
+  el("rect",{x:2306,y:810,width:38,height:34,rx:8},ic); el("rect",{x:2614,y:810,width:38,height:34,rx:8},ic);
+  for(let i=0;i<7;i++) el("circle",{cx:2175+i*104,cy:922,r:22,fill:"#fff",stroke:"#9aa69e","stroke-width":7},svg);
+  // unused corner
+  el("rect",{x:206,y:2617,width:451,height:337,fill:"#c9d1c6"},svg);
+  // stage + walkway + band
+  const C=1875, SX=C-421; // stage and band share one centre line
+  const wood=el("linearGradient",{id:"wood",x1:0,y1:0,x2:0,y2:1},defs);
+  el("stop",{offset:0,"stop-color":"#a8743f"},wood); el("stop",{offset:1,"stop-color":"#c99a63"},wood);
+  const neck=`M${C-340} 2383 Q${C-212} 2392 ${C-212} 2462 L${C-212} 2584 Q${C-212} 2650 ${C-350} 2650 L${C+350} 2650 Q${C+212} 2650 ${C+212} 2584 L${C+212} 2462 Q${C+212} 2392 ${C+340} 2383 Z`;
+  const clip=el("clipPath",{id:"neckClip"},defs); el("path",{d:neck},clip);
+  // runway: wood with planks, gold trim, red carpet and footlights
+  el("path",{d:neck,fill:"url(#wood)"},svg);
+  const planks=el("g",{"clip-path":"url(#neckClip)",stroke:"#94632f","stroke-width":3,opacity:.55},svg);
+  for(let x=C-340;x<=C+340;x+=48) el("line",{x1:x,y1:2383,x2:x,y2:2650},planks);
+  el("rect",{x:C-74,y:2383,width:148,height:267,fill:"#7c1c2b"},svg);
+  el("rect",{x:C-74,y:2383,width:148,height:267,fill:"none",stroke:"#d9a440","stroke-width":5},svg);
+  el("rect",{x:C-56,y:2383,width:112,height:267,fill:"none",stroke:"#d9a440","stroke-width":2,opacity:.6},svg);
+  el("path",{d:neck,fill:"none",stroke:"#d9a440","stroke-width":7},svg);
+  [2470,2525,2580].forEach(y=>[C-188,C+188].forEach(x=>el("circle",{cx:x,cy:y,r:9,fill:"#fff1c4",stroke:"#b8901f","stroke-width":3},svg)));
+  // stage
+  el("rect",{x:SX,y:1864,width:842,height:519,fill:"#7c1c2b",filter:"url(#sh)"},svg);
+  el("rect",{x:SX,y:1864,width:842,height:60,fill:"#9b2a3e"},svg);
+  el("rect",{x:SX+92,y:2090,width:658,height:210,fill:"#b88654"},svg);
+  for(let i=0;i<4;i++) el("line",{x1:SX+92,y1:2130+i*42,x2:SX+750,y2:2130+i*42,stroke:"#9b6b3c","stroke-width":4},svg);
+  el("rect",{x:SX,y:2298,width:842,height:85,fill:"#5c3a1e"},svg);
+  el("rect",{x:SX,y:2298,width:842,height:9,fill:"#d9a440"},svg);
+  el("rect",{x:C-340,y:2374,width:680,height:9,fill:"#d9a440"},svg);
+  [C-214,C,C+214].forEach(x=>{ el("path",{d:`M${x} 1920 L${x-80} 2298 L${x+80} 2298 Z`,fill:"#ffe9b8",opacity:.18},svg); el("circle",{cx:x,cy:1922,r:14,fill:"#fff1c4",stroke:"#5c3a1e","stroke-width":4},svg); });
+  txt(svg,C,2210,"المسرح",92,{fill:"#fff7e6","font-weight":800,stroke:"#3d240f","stroke-width":10,"paint-order":"stroke"});
+  // band platform, flush with the runway
+  el("path",{d:`M${C-350} 2650 H${C+350} V2910 Q${C+350} 2940 ${C+320} 2940 H${C-320} Q${C-350} 2940 ${C-350} 2910 Z`,fill:"#1f2c26"},svg);
+  el("rect",{x:C-350,y:2650,width:700,height:9,fill:"#d9a440"},svg);
+  el("rect",{x:C-330,y:2676,width:660,height:244,rx:20,fill:"none",stroke:"#8f7a3a","stroke-width":4},svg);
+  txt(svg,C,2798,"الفرقة الموسيقية",64,{fill:"#f6f1e3"});
+  [[C-275,2735],[C+275,2735],[C-215,2880],[C+215,2880]].forEach(([x,y])=>txt(svg,x,y,"♪",54,{fill:"#d9a440"}));
+}
+
+let tableNodes = {};
+function drawTables(svg){
+  const layer=el("g",{},svg);
+  T.forEach(t=>{
+    const g=el("g",{class:"tbl",tabindex:0,role:"button","data-id":t.id},layer);
+    const big=t.w>200||t.h>200;
+    const r=big?28:22;
+    const face=el("rect",{class:"face",x:t.x+4,y:t.y+4,width:t.w-8,height:t.h-8,rx:r,"stroke-width":8,filter:"url(#sh)"},g);
+    let inner=null;
+    if(t.kind==="vip"){ inner=el("rect",{x:t.x+20,y:t.y+20,width:t.w-40,height:t.h-40,rx:r-8,fill:"none",stroke:"#b8901f","stroke-width":6},g);
+      const bw=Math.min(110,t.w-30); el("rect",{x:t.x+t.w/2-bw/2,y:t.y+(big?12:-10),width:bw,height:big?52:40,rx:20,fill:"#b8901f"},g);
+      txt(g,t.x+t.w/2,t.y+(big?38:10),"VIP",big?36:28,{fill:"#2a1f05","font-weight":700,"font-family":"Georgia, serif"}); }
+    const cy=t.y+t.h/2+(t.kind==="vip"&&!big?14:0);
+    const label=txt(g,t.x+t.w/2,cy-(t.seats?22:0),t.label,t.label.length>2?46:(big?68:(t.kind==="vip"?50:56)),{fill:"#1b2a24","font-family":t.label.length>2?"Noto Kufi Arabic, Tahoma, sans-serif":"IBM Plex Sans Arabic, Arial, sans-serif"});
+    let seats=null; if(t.seats) seats=txt(g,t.x+t.w/2,cy+42,`${t.seats} مقاعد`,40,{fill:"#5d6b64"});
+    const title=el("title",{},g);
+    tableNodes[t.id]={g,face,label,seats,title};
+    g.addEventListener("click",()=>select(t.id));
+    g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); select(t.id);} });
+  });
+}
+
+function paint(){
+  T.forEach(t=>{
+    const n=tableNodes[t.id], taken=isTaken(t.id), sel=selected===t.id;
+    if(NOBOOK.has(t.id)){ n.g.classList.add("nobook"); n.g.removeAttribute("tabindex"); n.g.removeAttribute("role"); n.face.setAttribute("fill","#e3e7e1"); n.face.setAttribute("stroke","#c9d1c6"); n.face.setAttribute("stroke-width",8); n.label.setAttribute("fill","#6b766f"); n.title.textContent="طاولة بنات · غير متاحة للحجز"; return; }
+    n.g.classList.toggle("taken",taken);
+    n.face.setAttribute("fill", taken?"url(#hatch)": t.kind==="vip"?"#fbf2df":"#ffffff");
+    n.face.setAttribute("stroke", sel?"#2f7a55": t.kind==="vip"?"#c9a227":"#c9d1c6");
+    n.face.setAttribute("stroke-width", sel?16:8);
+    n.label.setAttribute("fill", taken?"#6b766f":"#1b2a24");
+    n.g.setAttribute("aria-pressed", sel?"true":"false");
+    n.title.textContent = `${tableName(t)}${t.kind==="vip"?" VIP":""}${t.seats?` · ${t.seats} مقاعد`:""} · ${taken?"محجوزة في هذا الوقت":"متاحة"}`;
+  });
+  const opt=[...$("#fTable").options]; opt.forEach(o=>{ if(o.value) o.disabled=isTaken(o.value) });
+}
+
+/* ===== Selection / form ===== */
+function select(id, scroll=true){
+  if(!byId[id]||NOBOOK.has(id)) return;
+  if(isTaken(id)){ showMsg("err","هذه الطاولة محجوزة في الوقت الذي اخترته. اختر وقتاً آخر أو طاولة أخرى."); return; }
+  selected=id; $("#fTable").value=id;
+  try{ history.replaceState(null,"","#t"+id) }catch(e){}
+  const t=byId[id];
+  $("#panelEmpty").hidden=true; $("#panelForm").hidden=false;
+  $("#pTitle").innerHTML=""; $("#pTitle").append(tableName(t));
+  if(t.kind==="vip"){ const c=document.createElement("span"); c.className="chip"; c.textContent="VIP"; $("#pTitle").append(c); }
+  updateSub(); hideMsg(); paint(); updateLinks();
+  if(scroll && matchMedia("(max-width:980px)").matches) $("#panel").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+function updateSub(){
+  if(!selected) return; const t=byId[selected];
+  $("#pSub").textContent=`${fmtDate($("#fDate").value)} · ${fmtT($("#fTime").value)}${t.seats?` · تتسع لـ ${t.seats} أشخاص`:""}`;
+}
+function stamp(d){ return `${fmtT(pad(d.getHours())+":"+pad(d.getMinutes()))} · ${fmtDate(isoDate(d))}`; }
+function requestText(){
+  const t=byId[selected];
+  return ["طلب حجز – مطعم سيما",
+    `الطاولة: ${tableName(t)}${t.kind==="vip"?" (VIP)":""}`,
+    `التاريخ: ${fmtDate($("#fDate").value)} (${$("#fDate").value})`,
+    `الوقت: ${fmtT($("#fTime").value)}`,
+    `عدد الأشخاص: ${$("#guests").value}`,
+    `الاسم: ${$("#name").value.trim()}`,
+    `الجوال: ${$("#phone").value.trim()}`,
+    $("#notes").value.trim()?`ملاحظات: ${$("#notes").value.trim()}`:null,
+    `وقت إرسال الطلب: ${stamp(new Date())}`].filter(Boolean).join("\n");
+}
+function valid(){ return $("#name").value.trim().length>1 && $("#phone").value.replace(/\D/g,"").length>=8 }
+function updateLinks(){
+  const ok=valid(), wa=$("#sendWa");
+  if(WHATSAPP){ wa.hidden=false; wa.href=ok?`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(requestText())}`:"#"; wa.setAttribute("aria-disabled", ok?"false":"true"); wa.style.opacity=ok?1:.5; }
+  else wa.hidden=true;
+  $("#formNote").textContent = ok ? (WHATSAPP?"سيفتح واتساب برسالة جاهزة فيها تفاصيل حجزك. يؤكد المطعم الحجز بالرد عليك.":"انسخ تفاصيل الطلب وأرسلها للمطعم، ويؤكد المطعم الحجز بالرد عليك.") : "اكتب اسمك ورقم جوالك لإكمال الطلب.";
+}
+["#name","#phone","#guests","#notes"].forEach(s=>$(s).addEventListener("input",updateLinks));
+$("#sendWa").addEventListener("click",e=>{ if(!valid()){ e.preventDefault(); showMsg("err","اكتب اسمك ورقم جوالك أولاً."); return; } updateLinks(); });
+$("#copyReq").addEventListener("click",async()=>{
+  if(!valid()){ showMsg("err","اكتب اسمك ورقم جوالك أولاً."); return; }
+  try{ await navigator.clipboard.writeText(requestText()); showMsg("ok","نُسخت تفاصيل الطلب. أرسلها للمطعم ليؤكد حجزك."); }
+  catch(e){ showMsg("err","لم يتمكن المتصفح من النسخ. اكتب التفاصيل يدوياً للمطعم."); }
+});
+function showMsg(k,s){ const m=$("#msg"); m.className="msg show "+k; m.textContent=s; if($("#panelForm").hidden){ $("#panelEmpty").querySelector(".note").textContent=s; } }
+function hideMsg(){ $("#msg").className="msg"; }
+
+$("#fDate").addEventListener("change",()=>{ onWhenChange() });
+$("#fTime").addEventListener("change",()=>{ onWhenChange() });
+$("#fTable").addEventListener("change",e=>{ if(e.target.value) select(e.target.value) });
+function onWhenChange(){
+  if(selected && isTaken(selected)){ selected=null; $("#panelForm").hidden=true; $("#panelEmpty").hidden=false; }
+  updateSub(); updateLinks(); paint(); renderStaff();
+}
+
+/* ===== Staff: save reservations (db) ===== */
+$("#form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!db||!staff||!selected) return;
+  if(!valid()){ showMsg("err","اكتب اسم الزبون ورقم جواله أولاً."); return; }
+  if(isTaken(selected)){ showMsg("err","هذه الطاولة محجوزة في هذا الوقت."); return; }
+  const btn=$("#saveBtn"); btn.disabled=true;
+  const id="r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const base={table:selected,date:$("#fDate").value,time:$("#fTime").value};
+  try{
+    await db.doc("slots/"+id).set(base);
+    await db.doc("reservations/"+id).set({...base,name:$("#name").value.trim(),phone:$("#phone").value.trim(),guests:+$("#guests").value,notes:$("#notes").value.trim(),createdAt:new Date().toISOString()});
+    showMsg("ok",`تم تأكيد حجز ${tableName(byId[selected])} الساعة ${fmtT(base.time)}.`);
+    ["#name","#phone","#notes"].forEach(s=>$(s).value=""); updateLinks();
+  }catch(err){ showMsg("err","لم يُحفظ الحجز. تحقق من الاتصال ثم حاول مرة أخرى."); }
+  btn.disabled=false;
+});
+function renderStaff(){
+  if(!staff) return;
+  const d=$("#fDate").value; $("#staffDate").textContent=fmtDate(d);
+  const list=$("#resList"); list.innerHTML="";
+  const items=reservations.filter(r=>r.date===d).sort((a,b)=>mins(a.time)-mins(b.time));
+  if(!items.length){ const li=document.createElement("li"); li.textContent="لا توجد حجوزات مؤكدة في هذا اليوم."; li.style.color="var(--muted)"; list.append(li); return; }
+  items.forEach(r=>{
+    const li=document.createElement("li"), info=document.createElement("div");
+    const a=document.createElement("div"); a.className="who"; a.textContent=`${fmtT(r.time)} · ${byId[r.table]?tableName(byId[r.table]):r.table} · ${r.name||""}`;
+    const b=document.createElement("div"); b.className="meta"; b.textContent=[r.createdAt?`تم الحجز: ${stamp(new Date(r.createdAt))}`:null,`${r.guests||"-"} أشخاص`,r.phone,r.occasion&&r.occasion!=="بدون"?r.occasion:null,r.notes||null].filter(Boolean).join(" · ");
+    info.append(a,b);
+    const del=document.createElement("button"); del.textContent="إلغاء الحجز";
+    del.addEventListener("click",async()=>{ if(!confirm("إلغاء هذا الحجز؟")) return; try{ await db.doc("slots/"+r.id).delete(); await db.doc("reservations/"+r.id).delete(); }catch(e){ alert("لم يُلغَ الحجز. حاول مرة أخرى."); } });
+    li.append(info,del); list.append(li);
+  });
+}
+
+/* ===== Program image ===== */
+const PROGRAM_ID = "local";
+const progBtn=$("#progBtn"), dlg=$("#progDlg"), pimg=$("#progImg");
+let assetsCap=null, artifactCap=null;
+function renderProgram(){
+  const has=!!PROGRAM_ID;
+  if(has){ pimg.addEventListener("load",()=>{ progBtn.hidden=false; }); pimg.src="program.jpg"; }
+  pimg.hidden=!has; $("#progEmpty").hidden=has;
+  $("#progUp").textContent = has?"تغيير الصورة":"تحميل صورة";
+  $("#progDel").hidden=!has;
+}
+pimg.addEventListener("error",()=>{ pimg.hidden=true; $("#progEmpty").hidden=false; });
+progBtn.addEventListener("click",()=>{ if(dlg.showModal) dlg.showModal(); else dlg.setAttribute("open",""); });
+$("#progClose").addEventListener("click",()=>dlg.close());
+dlg.addEventListener("click",e=>{ if(e.target===dlg) dlg.close(); });
+function progBusy(b,msg){ $("#progUp").disabled=b; $("#progDel").disabled=b; if(msg!==undefined) $("#progNote").textContent=msg; }
+function progErr(err,fallback){
+  const c=err&&err.code;
+  progBusy(false, c==="too_large"?"الصورة كبيرة جداً. الحد الأقصى 20 ميغابايت.": c==="unsupported_type"?"نوع الملف غير مدعوم. اختر صورة JPG أو PNG.": (c==="not_writer"||c==="not_granted")?"لا تملك صلاحية تعديل البرنامج.": c==="conflict"?"تغيّرت الصفحة قبل قليل. ستتحدث الآن، ثم حاول مرة أخرى.": fallback);
+}
+async function saveProgram(newId){
+  const res=await fetch("index.html",{cache:"no-store"});
+  if(!res.ok) throw {code:"source"};
+  let src=await res.text();
+  const re=/const PROGRAM_ID = "[^"]*";/;
+  if(!re.test(src)) throw {code:"source"};
+  await artifactCap.publish(src.replace(re,`const PROGRAM_ID = "${newId}";`));
+}
+$("#progUp").addEventListener("click",()=>$("#progFile").click());
+$("#progFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f||!assetsCap) return;
+  progBusy(true,"جارٍ تحميل الصورة…");
+  try{
+    const up=await assetsCap.upload(f);
+    const old=PROGRAM_ID; if(old){ try{ await assetsCap.delete(old) }catch(_){} }
+    progBusy(true,"تم تحميل الصورة. تتحدث الصفحة الآن…");
+    await saveProgram(up.id);
+  }catch(err){ progErr(err,"لم تُحمَّل الصورة. تحقق من الاتصال ثم حاول مرة أخرى."); }
+});
+$("#progDel").addEventListener("click",async()=>{
+  if(!PROGRAM_ID||!assetsCap||!confirm("حذف صورة البرنامج؟")) return;
+  progBusy(true,"جارٍ حذف الصورة…");
+  try{ await assetsCap.delete(PROGRAM_ID); await saveProgram(""); }
+  catch(err){ progErr(err,"لم تُحذف الصورة. حاول مرة أخرى."); }
+});
+renderProgram();
+(async()=>{ try{
+  if(!window.claude||!window.claude.use) return;
+  const [as,ar,u]=await Promise.all([window.claude.use("assets"),window.claude.use("artifact"),window.claude.use("user")]);
+  const owner = u ? await u.isOwner() : false;
+  if(as&&ar&&owner){ assetsCap=as; artifactCap=ar; progBtn.hidden=false; $("#progTools").hidden=false; }
+}catch(e){} })();
+
+/* ===== Boot ===== */
+const svg=$("#plan"); drawStatic(svg);
+requestAnimationFrame(()=>{ const sc=$("#planScroll"); sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)/2; });
+ drawTables(svg); paint(); updateLinks();
+const fromHash=(location.hash||"").replace(/^#t/,""); if(byId[fromHash]) select(fromHash,false);
+
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use) return;
+    db = await window.claude.use("db");
+    if(!db) return;
+    db.collection("slots").onSnapshot(snap=>{ slots=snap.docs.map(d=>({id:d.id,...d.data()})); paint(); }, ()=>{});
+    const user = await window.claude.use("user");
+    staff = user ? await user.isOwner() : false;
+    if(staff){
+      $("#staff").classList.add("show"); $("#saveBtn").hidden=false;
+      db.collection("reservations").onSnapshot(snap=>{ reservations=snap.docs.map(d=>({id:d.id,...d.data()})); renderStaff(); }, ()=>{});
+      renderStaff();
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
