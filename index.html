@@ -160,6 +160,7 @@ dialog.prog::backdrop{background:rgba(10,20,16,.6)}
             </div>
             <div><label for="guests">عدد الأشخاص</label><select id="guests"></select></div>
             <div><label for="notes">ملاحظات (اختياري)</label><textarea id="notes"></textarea></div>
+            <div style="background:var(--gold-soft);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.6"><strong>العربون:</strong> لتأكيد الحجز يُدفع عربون على البطاقة التالية<div dir="ltr" style="font-size:22px;font-weight:700;letter-spacing:1px;margin-top:6px;text-align:center">567622126</div><div style="margin-top:8px;font-size:14px">يرجى أخذ سكرين لعملية دفع العربون وإرسالها في الواتساب</div></div>
             <a class="btn gold" id="sendWa" href="#" target="_blank" rel="noopener">إرسال طلب الحجز عبر واتساب</a>
             <button type="button" class="btn ghost" id="copyReq">نسخ تفاصيل الطلب</button>
             <button type="submit" class="btn" id="saveBtn" hidden>تأكيد الحجز في النظام</button>
@@ -428,13 +429,13 @@ $("#form").addEventListener("submit",async e=>{
 });
 function renderStaff(){
   if(!staff) return;
-  const d=$("#fDate").value; $("#staffDate").textContent=fmtDate(d);
+  $("#staffDate").textContent="(كل الحجوزات المؤكدة)";
   const list=$("#resList"); list.innerHTML="";
-  const items=reservations.filter(r=>r.date===d).sort((a,b)=>mins(a.time)-mins(b.time));
-  if(!items.length){ const li=document.createElement("li"); li.textContent="لا توجد حجوزات مؤكدة في هذا اليوم."; li.style.color="var(--muted)"; list.append(li); return; }
+  const items=reservations.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  if(!items.length){ const li=document.createElement("li"); li.textContent="لا توجد حجوزات مؤكدة."; li.style.color="var(--muted)"; list.append(li); return; }
   items.forEach(r=>{
     const li=document.createElement("li"), info=document.createElement("div");
-    const a=document.createElement("div"); a.className="who"; a.textContent=`${fmtT(r.time)} · ${byId[r.table]?tableName(byId[r.table]):r.table} · ${r.name||""}`;
+    const a=document.createElement("div"); a.className="who"; a.textContent=`${fmtDate(r.date)} · ${fmtT(r.time)} · ${byId[r.table]?tableName(byId[r.table]):r.table} · ${r.name||""}`;
     const b=document.createElement("div"); b.className="meta"; b.textContent=[r.createdAt?`تم الحجز: ${stamp(new Date(r.createdAt))}`:null,`${r.guests||"-"} أشخاص`,r.phone,r.occasion&&r.occasion!=="بدون"?r.occasion:null,r.notes||null].filter(Boolean).join(" · ");
     info.append(a,b);
     const del=document.createElement("button"); del.textContent="إلغاء الحجز";
@@ -449,7 +450,7 @@ const progBtn=$("#progBtn"), dlg=$("#progDlg"), pimg=$("#progImg");
 let assetsCap=null, artifactCap=null;
 function renderProgram(){
   const has=!!PROGRAM_ID;
-  if(has){ pimg.addEventListener("load",()=>{ progBtn.hidden=false; }); pimg.src="program.jpg"; }
+  if(has){ pimg.src="program.jpg"; progBtn.hidden=false; }
   pimg.hidden=!has; $("#progEmpty").hidden=has;
   $("#progUp").textContent = has?"تغيير الصورة":"تحميل صورة";
   $("#progDel").hidden=!has;
